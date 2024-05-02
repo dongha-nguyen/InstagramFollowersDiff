@@ -1,39 +1,31 @@
 import json
 
+def parse_ig_json(file: str):
+    with open(file, "r") as file:
+        content = json.load(file)
+    
+    data = set()
+    for item in content:
+        for string_data in item["string_list_data"]:
+            info = string_data["value"]
+            data.add(info)
+
+    return data
 
 def main():
     try:
-        # Open the following file
-        with open("/Applications/InstagramFollowers/InstagramFollowersDiff/following.json", "r") as file:
-            data = json.load(file)
-
-        # Extract all values
-        valuesFollowing = set()
-        for item in data["relationships_following"]:
-            for string_data in item["string_list_data"]:
-                valuesFollowing.add(string_data["value"])
-
-        # Open the followers file
-        with open("/Applications/InstagramFollowers/InstagramFollowersDiff/followers_1.json", "r") as file:
-            dataFollowers = json.load(file)
+        following = parse_ig_json("following.json")
         
-        valuesFollowers = set()
-        for item in dataFollowers:
-            for string_data in item["string_list_data"]:
-                myId = string_data["value"]
-                valuesFollowers.add(myId)
+        followers = parse_ig_json("followers_1.json")
         
-        valuesNotFollowing = set()
-        for myValue in valuesFollowing:
-            if myValue not in valuesFollowers:
-                valuesNotFollowing.add(myValue)
+        notFollowing = following.difference(followers)
 
             # Write values to file
         with open("output.txt", "w") as file:
-            file.write("Following Length: " + str(len(valuesFollowing)) + "\n")
-            file.write("Followers Length: " + str(len(valuesFollowers)) + "\n")
+            file.write("Following Length: " + str(len(following)) + "\n")
+            file.write("Followers Length: " + str(len(followers)) + "\n")
             file.write("=====================================" + "\n\n")
-            for value in valuesNotFollowing:
+            for value in notFollowing:
                 file.write(value + "\n")
 
         print("Values written to 'output.txt'.")
