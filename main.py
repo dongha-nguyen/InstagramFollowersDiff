@@ -1,12 +1,24 @@
 import json
 
-def parse_ig_json(file: str):
+def parse_followers_json(file: str):
+    with open(file, "r") as file:
+        content = json.load(file)
+    
+    data = set()
+    for item in content["relationships_following"]:
+        for string_data in item["string_list_data"]: 
+            info = string_data["value"]
+            data.add(info)
+
+    return data
+
+def parse_following_json(file: str):
     with open(file, "r") as file:
         content = json.load(file)
     
     data = set()
     for item in content:
-        for string_data in item["string_list_data"]:
+        for string_data in item["string_list_data"]: 
             info = string_data["value"]
             data.add(info)
 
@@ -14,13 +26,13 @@ def parse_ig_json(file: str):
 
 def main():
     try:
-        following = parse_ig_json("following.json")
+        following = parse_followers_json("following.json")
         
-        followers = parse_ig_json("followers_1.json")
+        followers = parse_following_json("followers_1.json")
         
         notFollowing = following.difference(followers)
 
-            # Write values to file
+        # Write values to file
         with open("output.txt", "w") as file:
             file.write("Following Length: " + str(len(following)) + "\n")
             file.write("Followers Length: " + str(len(followers)) + "\n")
